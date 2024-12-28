@@ -1,0 +1,3 @@
+[submodule "mlops"]
+	path = mlops
+	url = git@github.com:ar-bansal/mlops.git
