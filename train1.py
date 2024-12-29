@@ -1,11 +1,16 @@
+import mlflow
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
 from ml.models import VGGStyleV1
 from ml.pipelines import run_pipeline
+from mlops.ml_logging import get_tracking_uri
 
 
 if __name__ == "__main__":
+    tracking_server_uri = get_tracking_uri()
+    mlflow.set_tracking_uri(tracking_server_uri)
+
     BATCH_SIZE = 64
     NUM_EPOCHS = 5
 
