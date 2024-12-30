@@ -14,7 +14,7 @@ if __name__ == "__main__":
     mlflow.set_tracking_uri(tracking_server_uri)
 
     BATCH_SIZE = 64
-    NUM_EPOCHS = 5
+    NUM_EPOCHS = 100
     NUM_WORKERS = os.cpu_count()
 
     transform = transforms.Compose([
