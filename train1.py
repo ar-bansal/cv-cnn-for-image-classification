@@ -28,7 +28,10 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    class_labels = CIFAR10.classes
+    class_labels = [
+        "airplane", "automobile", "bird", "cat", 
+        "deer", "dog", "frog", "horse", "ship", "truck"
+    ]
    
     run_pipeline(
         VGGStyleV1(), 
