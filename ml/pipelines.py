@@ -9,7 +9,14 @@ from mlops.ml_logging import log_pytorch
 __all__ = ["run_pipeline"]
 
 def train(model, data_loader, n_epochs):
-    trainer = L.Trainer(max_epochs=n_epochs, logger=False, enable_checkpointing=False, devices=-1)
+    trainer = L.Trainer(
+        accelerator="auto", 
+        strategy="auto", 
+        devices="auto", 
+        max_epochs=n_epochs, 
+        logger=False, 
+        enable_checkpointing=False
+    )
     trainer.fit(model=model, train_dataloaders=data_loader)
 
     return trainer
