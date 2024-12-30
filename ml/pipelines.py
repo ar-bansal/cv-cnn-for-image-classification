@@ -10,9 +10,9 @@ __all__ = ["run_pipeline"]
 
 def train(model, data_loader, n_epochs):
     trainer = L.Trainer(
-        accelerator="auto", 
+        accelerator="gpu", 
         strategy="auto", 
-        devices="auto", 
+        devices=1, 
         max_epochs=n_epochs, 
         logger=False, 
         enable_checkpointing=False
