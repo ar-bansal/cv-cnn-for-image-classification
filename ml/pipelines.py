@@ -19,7 +19,7 @@ def train(model, data_loader, n_epochs):
     )
     trainer.fit(model=model, train_dataloaders=data_loader)
 
-    return trainer
+    return trainer.model
 
 def evaluate(model, data_loader):
     model.eval()
