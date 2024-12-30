@@ -37,9 +37,12 @@ def evaluate(model, data_loader):
     return np.concatenate(all_predictions), np.concatenate(all_targets)
 
 def get_metrics(predictions, targets, class_labels=None):
+    predicted_classes = np.array(class_labels)[predictions]
+    target_classes = np.array(class_labels)[targets]
+
     cls_report = classification_report(
-        targets, 
-        predictions, 
+        target_classes, 
+        predicted_classes, 
         target_names=class_labels, 
         output_dict=True
     )
@@ -50,15 +53,15 @@ def get_metrics(predictions, targets, class_labels=None):
     pred_idxs = [f"pred_{label}" for label in class_labels]
 
     cm = confusion_matrix(
-        targets, 
-        predictions, 
+        target_classes, 
+        predicted_classes, 
         labels=class_labels
     ).T
 
     cm_df = pd.DataFrame(cm, columns=true_cols, index=pred_idxs)
 
     return {
-        "valid_accuracy": round(accuracy_score(targets, predictions), 4), 
+        "valid_accuracy": round(accuracy_score(target_classes, predicted_classes), 4), 
         "valid_classification_report": report_df, 
         "valid_confusion_matrix": cm_df
     }
