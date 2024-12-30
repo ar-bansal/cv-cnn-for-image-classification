@@ -7,3 +7,5 @@ mlops_data
 
 *.pem
 *accessKeys*
+
+setup-gpu.sh
