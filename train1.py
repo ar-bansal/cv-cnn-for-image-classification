@@ -1,4 +1,6 @@
+import os
 import mlflow
+import torch
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
@@ -13,6 +15,7 @@ if __name__ == "__main__":
 
     BATCH_SIZE = 64
     NUM_EPOCHS = 5
+    NUM_WORKERS = os.cpu_count()
 
     transform = transforms.Compose([
         transforms.ToTensor(), 
@@ -25,8 +28,21 @@ if __name__ == "__main__":
     train_dataset = CIFAR10(root="./data/train", train=True, transform=transform, download=True)
     test_dataset = CIFAR10(root="./data/test", train=False, transform=transform, download=True)
 
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=BATCH_SIZE, 
+        shuffle=True, 
+        num_workers=NUM_WORKERS, 
+        pin_memory=True if torch.cuda.is_available() else False
+
+    )
+    test_loader = DataLoader(
+        test_dataset, 
+        batch_size=BATCH_SIZE, 
+        shuffle=False,  
+        num_workers=NUM_WORKERS, 
+        pin_memory=True if torch.cuda.is_available() else False
+    )
 
     class_labels = [
         "airplane", "automobile", "bird", "cat", 
