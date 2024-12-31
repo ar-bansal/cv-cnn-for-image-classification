@@ -1,4 +1,4 @@
-name: yolov1-pytorch
+name: cnn-env
 channels:
   - pytorch
   - defaults
