@@ -10,7 +10,7 @@ from ml.pipelines import run_pipeline
 from mlops.ml_logging import get_tracking_uri
 
 
-if __name__ == "__main__":
+def main():
     tracking_server_uri = get_tracking_uri()
     mlflow.set_tracking_uri(tracking_server_uri)
 
@@ -75,8 +75,12 @@ if __name__ == "__main__":
         VGGStyleV1(), 
         NUM_EPOCHS, 
         train_loader, 
+        val_loader, 
         test_loader, 
         class_labels, 
         experiment_name="vgg-style-cnn"
     )
 
+
+if __name__ == "__main__":
+    main()
