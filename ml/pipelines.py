@@ -1,40 +1,48 @@
 import numpy as np
 import pandas as pd
 import torch
-import pytorch_lightning as L
+from pytorch_lightning import Trainer
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from mlops.ml_logging import log_pytorch
 
 
 __all__ = ["run_pipeline"]
 
-def train(model, data_loader, n_epochs):
-    trainer = L.Trainer(
-        accelerator="gpu", 
-        strategy="auto", 
-        devices=1, 
-        max_epochs=n_epochs, 
-        logger=False, 
-        enable_checkpointing=False
-    )
-    trainer.fit(model=model, train_dataloaders=data_loader)
+
+def create_trainer(n_epochs: int=None) -> Trainer:
+    trainer = Trainer(
+            max_epochs=n_epochs, 
+            logger=False, 
+            enable_checkpointing=False
+        )
+    return trainer
+
+
+def train(model, train_dataloader, val_dataloader, n_epochs):
+    trainer = create_trainer(n_epochs)
+    trainer.fit(
+        model=model, 
+        train_dataloaders=train_dataloader, 
+        val_dataloaders=val_dataloader
+        )
 
     return trainer.model
 
-def evaluate(model, data_loader):
-    model.eval()
 
+def evaluate(model, test_dataloader):
+    model.eval()
     all_predictions = []
     all_targets = []
 
     with torch.no_grad():
-        for x, targets in data_loader:
+        for x, targets in test_dataloader:
             logits = model(x)
             y_pred = torch.argmax(logits, 1)
             all_predictions.append(y_pred.cpu().numpy())
             all_targets.append(targets.cpu().numpy())
 
     return np.concatenate(all_predictions), np.concatenate(all_targets)
+
 
 def get_metrics(predictions, targets, class_labels=None):
     predicted_classes = np.array(class_labels)[predictions]
@@ -61,17 +69,17 @@ def get_metrics(predictions, targets, class_labels=None):
     cm_df = pd.DataFrame(cm, columns=true_cols, index=pred_idxs)
 
     return {
-        "valid_accuracy": round(accuracy_score(target_classes, predicted_classes), 4), 
-        "valid_classification_report": report_df, 
-        "valid_confusion_matrix": cm_df
+        "test_accuracy": round(accuracy_score(target_classes, predicted_classes), 4), 
+        "test_classification_report": report_df, 
+        "test_confusion_matrix": cm_df
     }
 
 
 @log_pytorch(logging_kwargs={"log_every_n_epoch": 1})
-def run_pipeline(model, n_epochs, train_data_loader, test_data_loader, class_labels, experiment_name):
-    model = train(model, train_data_loader, n_epochs)
+def run_pipeline(model, n_epochs, train_loader, val_loader, test_loader, class_labels, experiment_name):
+    model = train(model, train_loader, val_loader, n_epochs)
 
-    preds, targets = evaluate(model, test_data_loader)
+    preds, targets = evaluate(model, test_loader)
 
     metrics = get_metrics(preds, targets, class_labels=class_labels)
 
