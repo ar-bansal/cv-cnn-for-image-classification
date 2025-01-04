@@ -4,6 +4,7 @@ temp*
 test*
 
 mlops_data
+data
 
 *.pem
 *accessKeys*
