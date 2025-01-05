@@ -1,7 +1,9 @@
 **/__pycache__
 
+
 temp*
 test*
+!test_model_setup.py
 
 mlops_data
 data
