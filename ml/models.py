@@ -272,6 +272,7 @@ class InceptionStyleV1(InceptionBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Input shape = (B, 3, 32, 32)
         self.block1 = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, padding=1), 
             nn.ReLU(), 
@@ -279,6 +280,7 @@ class InceptionStyleV1(InceptionBase):
             nn.ReLU(), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
+        # Output shape = (B, 32, 16, 16)
 
         self.block2 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=3, padding=1), 
@@ -287,6 +289,7 @@ class InceptionStyleV1(InceptionBase):
             nn.ReLU(), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
+        # Output shape = (B, 64, 8, 8)
 
         self.inception3 = InceptionModule(
             in_channels=64, 
@@ -297,17 +300,19 @@ class InceptionStyleV1(InceptionBase):
             f_5x5=4, 
             f_pp=4, 
         )
+        # Output shape = (B, 20, 8, 8)
 
         self.pool4 = nn.AdaptiveAvgPool2d((1, 1))
+        # Output shape = (B, 20, 1, 1)
 
-        self.fc = nn.Linear(1280, 10)
+        self.fc = nn.Linear(20, 10)
 
     def forward(self, x):
         x = self.block1(x)
         x = self.block2(x)
         x = self.inception3(x)
         x = self.pool4(x)
-        # x = x.flatten(1)
+        x = x.flatten(1)
         return self.fc(x)
     
 
@@ -315,7 +320,7 @@ class InceptionStyleV2(InceptionBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Input shape = batch_size x 3 x 32 x 32
+        # Input shape = (B, 3, 32, 32)
         self.block1 = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, padding=1), 
             nn.ReLU(), 
@@ -323,7 +328,7 @@ class InceptionStyleV2(InceptionBase):
             nn.ReLU(), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
-        # Output shape = batch_size x 32 x 16 x 16
+        # Output shape = (B, 32, 16, 16)
 
         self.block2 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=3, padding=1), 
@@ -332,7 +337,7 @@ class InceptionStyleV2(InceptionBase):
             nn.ReLU(), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
-        # Output shape = batch_size x 64 x 8 x 8 
+        # Output shape = (B, 64, 8, 8)
 
         self.inception3 = InceptionModule(
             in_channels=64, 
@@ -343,7 +348,7 @@ class InceptionStyleV2(InceptionBase):
             f_5x5=12, 
             f_pp=12, 
         )
-        # Output shape = batch_size x 48 x 8 x 8
+        # Output shape = (B, 48, 8, 8)
 
         self.inception4 = InceptionModule(
             in_channels=48, 
@@ -354,12 +359,12 @@ class InceptionStyleV2(InceptionBase):
             f_5x5=4, 
             f_pp=4, 
         )
-        # Output shape = batch_size x 20 x 8 x 8 
+        # Output shape = (B, 20, 8, 8)
 
         self.pool4 = nn.AdaptiveAvgPool2d((1, 1))
-        # Output shape = batch_size x 1280
+        # Output shape = (B, 20, 1, 1)
 
-        self.fc = nn.Linear(1280, 10)
+        self.fc = nn.Linear(20, 10)
 
     def forward(self, x):
         x = self.block1(x)
@@ -367,5 +372,5 @@ class InceptionStyleV2(InceptionBase):
         x = self.inception3(x)
         x = self.inception4(x)
         x = self.pool4(x)
-        # x = x.flatten(1)
+        x = x.flatten(1)
         return self.fc(x)
