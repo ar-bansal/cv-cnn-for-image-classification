@@ -306,7 +306,8 @@ class InceptionStyleV1(InceptionBase):
         x = self.block1(x)
         x = self.block2(x)
         x = self.inception3(x)
-        x = x.flatten(1)
+        x = self.pool4(x)
+        # x = x.flatten(1)
         return self.fc(x)
     
 
@@ -366,5 +367,5 @@ class InceptionStyleV2(InceptionBase):
         x = self.inception3(x)
         x = self.inception4(x)
         x = self.pool4(x)
-        x = x.flatten(1)
+        # x = x.flatten(1)
         return self.fc(x)
