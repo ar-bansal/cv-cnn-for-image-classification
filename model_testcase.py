@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
-from ml.models import InceptionStyleV1
+from ml.models import * 
 from ml.pipelines import run_pipeline
 
 
@@ -79,7 +79,7 @@ def main():
     ]
    
     run_pipeline(
-        InceptionStyleV1(), 
+        InceptionStyleV2(), 
         NUM_EPOCHS, 
         train_loader, 
         val_loader, 
