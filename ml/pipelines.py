@@ -11,8 +11,6 @@ __all__ = ["run_pipeline"]
 
 def create_trainer(n_epochs: int=None) -> Trainer:
     trainer = Trainer(
-            accelerator="gpu", 
-            devices=1, 
             max_epochs=n_epochs, 
             logger=False, 
             enable_checkpointing=False
