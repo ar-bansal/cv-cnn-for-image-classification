@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
-from ml.models import * 
+from ml.models import ResNetV1
 from ml.pipelines import run_pipeline
 
 
@@ -17,6 +17,7 @@ def main():
         raise requests.exceptions.ConnectionError("Unable to reach MLOps.")
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
+    MODEL = ResNetV1()
     RANDOM_STATE = 0
     BATCH_SIZE = 8
     NUM_EPOCHS = 1
@@ -79,7 +80,7 @@ def main():
     ]
    
     run_pipeline(
-        InceptionStyleV2(), 
+        MODEL, 
         NUM_EPOCHS, 
         train_loader, 
         val_loader, 
