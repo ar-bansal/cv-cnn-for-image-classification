@@ -274,19 +274,15 @@ class InceptionStyleV1(InceptionBase):
 
         # Input shape = (B, 3, 32, 32)
         self.block1 = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1), 
-            nn.ReLU(), 
-            nn.Conv2d(32, 32, kernel_size=3, padding=1), 
-            nn.ReLU(), 
+            ConvBlock(3, 32, kernel_size=3, padding=1), 
+            ConvBlock(32, 32, kernel_size=3, padding=1), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
         # Output shape = (B, 32, 16, 16)
 
         self.block2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=3, padding=1), 
-            nn.ReLU(), 
-            nn.Conv2d(64, 64, kernel_size=3, padding=1), 
-            nn.ReLU(), 
+            ConvBlock(32, 64, kernel_size=3, padding=1), 
+            ConvBlock(64, 64, kernel_size=3, padding=1), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
         # Output shape = (B, 64, 8, 8)
@@ -322,19 +318,15 @@ class InceptionStyleV2(InceptionBase):
 
         # Input shape = (B, 3, 32, 32)
         self.block1 = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1), 
-            nn.ReLU(), 
-            nn.Conv2d(32, 32, kernel_size=3, padding=1), 
-            nn.ReLU(), 
+            ConvBlock(3, 32, kernel_size=3, padding=1), 
+            ConvBlock(32, 32, kernel_size=3, padding=1), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
         # Output shape = (B, 32, 16, 16)
 
         self.block2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=3, padding=1), 
-            nn.ReLU(), 
-            nn.Conv2d(64, 64, kernel_size=3, padding=1), 
-            nn.ReLU(), 
+            ConvBlock(32, 64, kernel_size=3, padding=1), 
+            ConvBlock(64, 64, kernel_size=3, padding=1), 
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
         # Output shape = (B, 64, 8, 8)
