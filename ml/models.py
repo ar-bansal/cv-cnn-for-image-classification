@@ -366,3 +366,61 @@ class InceptionStyleV2(InceptionBase):
         x = self.pool4(x)
         x = x.flatten(1)
         return self.fc(x)
+    
+
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, stride, downsample=None):
+        super(ResidualBlock, self).__init__()
+
+        self.conv1 = ConvBlock(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=stride, padding=1)
+        self.relu = nn.ReLU()
+        self.downsample = downsample
+
+    def forward(self, x):
+        identity = x
+        if self.downsample:
+            identity = self.downsample(x)
+
+        out = self.conv1(x)
+        out = self.conv2(out)
+        out += identity
+        out = self.relu(out)
+
+        return out
+
+
+class ResNetV1(InceptionBase):
+    def __init__(self):
+        super(ResNetV1, self).__init__()
+
+        # Input shape = (B, 3, 32, 32)
+        self.res1 = ResidualBlock(3, 32, stride=1)
+        # Output shape = (B, 32, 32, 32)
+
+        downsample1 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
+        self.res2 = ResidualBlock(32, 64, stride=1, downsample=downsample1)
+        # Output shape = (B, 64, 16, 16)
+
+        downsample2 = nn.Conv2d(128, 128, kernel_size=3, stride=3)
+        self.res3 = ResidualBlock(64, 128, stride=1, downsample=downsample2)
+        # Output shape = (B, 128, 8, 8)
+
+        self.pool4 = nn.AdaptiveAvgPool2d((1, 1))
+        # Output shape = (B, 128, 1, 1)
+
+        # Input shape = (B, 128) [after flattening]
+        self.fc5 = nn.Linear(128, 10)
+        # Output shape = (B, 10) 
+
+
+    def forward(self, x):
+        x = self.res1(x)
+        x = self.res2(x)
+        x = self.res3(x)
+        x = self.pool4(x)
+        x = x.flatten(1)
+        x = self.fc5(x)
+
+        return x
+    
