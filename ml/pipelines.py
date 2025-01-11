@@ -1,9 +1,15 @@
+import os
 import numpy as np
 import pandas as pd
-import torch
-from pytorch_lightning import Trainer
+import mlflow
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
-from mlops.ml_logging import log_pytorch
+import torch
+from torch.utils.data import DataLoader, Subset
+from torchvision.datasets import CIFAR10
+from torchvision import transforms
+from pytorch_lightning import Trainer
+from mlops.ml_logging import get_tracking_uri, log_pytorch
 
 
 __all__ = ["run_pipeline"]
@@ -76,7 +82,7 @@ def get_metrics(predictions, targets, class_labels=None):
 
 
 @log_pytorch(logging_kwargs={"log_every_n_epoch": 1})
-def run_pipeline(model, n_epochs, train_loader, val_loader, test_loader, class_labels, experiment_name):
+def train_and_evaluate(model, n_epochs, train_loader, val_loader, test_loader, class_labels, experiment_name):
     model = train(model, train_loader, val_loader, n_epochs)
 
     preds, targets = evaluate(model, test_loader)
@@ -84,3 +90,74 @@ def run_pipeline(model, n_epochs, train_loader, val_loader, test_loader, class_l
     metrics = get_metrics(preds, targets, class_labels=class_labels)
 
     return model, metrics
+
+
+def run_pipeline(model, batch_size, num_epochs, num_workers, val_size, experiment_name, random_state):
+    PIN_MEMORY = True if torch.cuda.is_available() else False
+    DATA_DIR = os.path.join(os.getcwd(), "data")
+    TRAIN_DATA_DIR = os.path.join(DATA_DIR, "train")
+    TEST_DATA_DIR = os.path.join(DATA_DIR, "test")
+
+    tracking_server_uri = get_tracking_uri()
+    mlflow.set_tracking_uri(tracking_server_uri)
+
+    transform = transforms.Compose([
+        transforms.ToTensor(), 
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], 
+            std=[0.229, 0.224, 0.225]
+        )
+    ])
+
+    dataset = CIFAR10(root=TRAIN_DATA_DIR, train=True, transform=transform, download=True)
+    targets = dataset.targets
+
+    # Split the dataset into train and validation sets. 
+    train_indices, val_indices = train_test_split(
+        range(len(targets)), 
+        test_size=val_size, 
+        stratify=targets, 
+        random_state=random_state
+    )
+
+    train_dataset = Subset(dataset, train_indices)
+    val_dataset = Subset(dataset, val_indices)
+    test_dataset = CIFAR10(root=TEST_DATA_DIR, train=False, transform=transform, download=True)
+
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=batch_size, 
+        shuffle=True, 
+        num_workers=num_workers, 
+        pin_memory=PIN_MEMORY
+
+    )
+    val_loader = DataLoader(
+        val_dataset, 
+        batch_size=batch_size, 
+        shuffle=False, 
+        num_workers=num_workers, 
+        pin_memory=PIN_MEMORY
+    )
+    test_loader = DataLoader(
+        test_dataset, 
+        batch_size=batch_size, 
+        shuffle=False,  
+        num_workers=num_workers, 
+        pin_memory=PIN_MEMORY
+    )
+
+    class_labels = [
+        "airplane", "automobile", "bird", "cat", "deer", 
+        "dog", "frog", "horse", "ship", "truck"
+    ]
+   
+    train_and_evaluate(
+        model, 
+        num_epochs, 
+        train_loader, 
+        val_loader, 
+        test_loader, 
+        class_labels, 
+        experiment_name=experiment_name
+    )
