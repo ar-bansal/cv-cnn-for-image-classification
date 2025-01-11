@@ -1,29 +1,27 @@
-import requests
+import os
 import mlflow
 from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
-from ml.models import InceptionResNetStyleV1
+from ml.models import ResNetStyleV1
 from ml.pipelines import run_pipeline
+from mlops.ml_logging import get_tracking_uri
 
 
 def main():
-    MLFLOW_TRACKING_URI = "http://localhost:5001/"
-    try:
-        requests.get(MLFLOW_TRACKING_URI)
-    except:
-        raise requests.exceptions.ConnectionError("Unable to reach MLOps.")
-    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-
-    MODEL = InceptionResNetStyleV1()
+    MODEL = ResNetStyleV1()
+    EXPERIMENT_NAME = "resnet-style-cnn"
     RANDOM_STATE = 0
-    BATCH_SIZE = 8
-    NUM_EPOCHS = 1
-    NUM_WORKERS = 2
-    NUM_SAMPLES = 200
+    BATCH_SIZE = 64
+    NUM_EPOCHS = 100
+    NUM_WORKERS = os.cpu_count()
+    TEST_SIZE = 0.05
     PIN_MEMORY = True if torch.cuda.is_available() else False
+
+    tracking_server_uri = get_tracking_uri()
+    mlflow.set_tracking_uri(tracking_server_uri)
 
     transform = transforms.Compose([
         transforms.ToTensor(), 
@@ -39,17 +37,14 @@ def main():
     # Split the dataset into train and validation sets. 
     train_indices, val_indices = train_test_split(
         range(len(targets)), 
-        test_size=0.2, 
+        test_size=TEST_SIZE, 
         stratify=targets, 
         random_state=RANDOM_STATE
     )
 
-    train_dataset = Subset(dataset, train_indices[:NUM_SAMPLES])
-    val_dataset = Subset(dataset, val_indices[:NUM_SAMPLES])
-    test_dataset = Subset(
-        CIFAR10(root="./data/test", train=False, transform=transform, download=True), 
-        range(NUM_SAMPLES)
-    )
+    train_dataset = Subset(dataset, train_indices)
+    val_dataset = Subset(dataset, val_indices)
+    test_dataset = CIFAR10(root="./data/test", train=False, transform=transform, download=True)
 
     train_loader = DataLoader(
         train_dataset, 
@@ -86,7 +81,7 @@ def main():
         val_loader, 
         test_loader, 
         class_labels, 
-        experiment_name="inception-style-cnn"
+        experiment_name=EXPERIMENT_NAME
     )
 
 
