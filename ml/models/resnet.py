@@ -2,9 +2,9 @@ import torch.nn as nn
 from .utils import Model, ConvBlock, SkipConnection
 
 
-class ResNetV1(Model):
+class ResNetStyleV1(Model):
     def __init__(self):
-        super(ResNetV1, self).__init__()
+        super(ResNetStyleV1, self).__init__()
 
         # Input shape = (B, 3, 32, 32)
         self.conv1 = ConvBlock(3, 32, kernel_size=3, stride=1, padding=1)
