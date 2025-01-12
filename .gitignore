@@ -16,3 +16,4 @@ setup-gpu.sh
 ssh*
 
 **/*.csv
+!metrics/*.csv
