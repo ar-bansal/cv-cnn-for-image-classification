@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.optim as optim
 from .utils import Model, ConvBlock, SkipConnection
 
 
@@ -56,3 +57,30 @@ class ResNetStyleV1(Model):
 
         return x
     
+
+class ResNetDropoutV1(ResNetStyleV1):
+    def __init__(self):
+        super(ResNetDropoutV1, self).__init__()
+        
+        self.dropout = nn.Dropout(0.5)
+
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.res1(x)
+        x = self.res2(x)
+        x = self.res3(x)
+        x = self.pool4(x)
+        x = self.flatten(x)
+        x = self.fc5(x)
+        x = self.dropout(x)
+
+        return x
+
+
+class ResNetWDecayV1(ResNetStyleV1):
+    def __init__(self):
+        super(ResNetWDecayV1, self).__init__()
+
+    def configure_optimizers(self):
+        return optim.AdamW(self.parameters(), lr=1e-3, weight_decay=1e-1)
