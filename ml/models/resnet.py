@@ -76,6 +76,46 @@ class ResNetDropoutV1(ResNetStyleV1):
         x = self.dropout(x)
 
         return x
+    
+
+class ResNetDropoutV2(ResNetDropoutV1):
+    """
+    Uses dropout after the GAP layer, before the fully connected layer. 
+    """
+    def __init__(self):
+        super(ResNetDropoutV2, self).__init__()
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.res1(x)
+        x = self.res2(x)
+        x = self.res3(x)
+        x = self.pool4(x)
+        x = self.dropout(x)
+        x = self.flatten(x)
+        x = self.fc5(x)
+
+        return x
+
+
+class ResNetDropoutV3(ResNetDropoutV1):
+    """
+    Uses dropout before the GAP layer. 
+    """
+    def __init__(self):
+        super(ResNetDropoutV3, self).__init__()
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.res1(x)
+        x = self.res2(x)
+        x = self.res3(x)
+        x = self.dropout(x)
+        x = self.pool4(x)
+        x = self.flatten(x)
+        x = self.fc5(x)
+
+        return x
 
 
 class ResNetWDecayV1(ResNetStyleV1):
