@@ -28,3 +28,8 @@ From the training metric plots, we can deduce the following:
 4. Skip connecting the inception module however, leads to a drastic drop in the validation accuracy of the model. Removing the skip connections from the conv blocks, leads to a further decrease in the training and validation accuracy. 
 
 From the above metric plots and insights, we chose the ResNet architecture as our baseline model for this dataset. 
+
+
+## References
+
+https://pgaleone.eu/deep-learning/regularization/2017/01/10/anaysis-of-dropout/
