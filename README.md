@@ -33,3 +33,4 @@ From the above metric plots and insights, we chose the ResNet architecture as ou
 ## References
 
 https://pgaleone.eu/deep-learning/regularization/2017/01/10/anaysis-of-dropout/
+https://arxiv.org/pdf/2302.06112
