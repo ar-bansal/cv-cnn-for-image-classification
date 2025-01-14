@@ -77,12 +77,20 @@ class ResNetDropoutV1(ResNetStyleV1):
 
     def forward(self, x):
         x = self.conv1(x)
-        x = self.res1(x)
+
         x = self.res2(x)
+        x = self.relu(x)
+
         x = self.res3(x)
-        x = self.pool4(x)
+        x = self.relu(x)
+
+        x = self.res4(x)
+        x = self.relu(x)
+
+        x = self.pool5(x)
         x = self.flatten(x)
-        x = self.fc5(x)
+
+        x = self.fc6(x)
         x = self.dropout(x)
 
         return x
@@ -97,13 +105,21 @@ class ResNetDropoutV2(ResNetDropoutV1):
 
     def forward(self, x):
         x = self.conv1(x)
-        x = self.res1(x)
+
         x = self.res2(x)
+        x = self.relu(x)
+
         x = self.res3(x)
-        x = self.pool4(x)
-        x = self.dropout(x)
+        x = self.relu(x)
+
+        x = self.res4(x)
+        x = self.relu(x)
+
+        x = self.pool5(x)
         x = self.flatten(x)
-        x = self.fc5(x)
+        x = self.dropout(x)
+
+        x = self.fc6(x)
 
         return x
 
@@ -115,15 +131,25 @@ class ResNetDropoutV3(ResNetDropoutV1):
     def __init__(self):
         super(ResNetDropoutV3, self).__init__()
 
+        self.dropout2d = nn.Dropout2d(0.5)
+
     def forward(self, x):
         x = self.conv1(x)
-        x = self.res1(x)
+
         x = self.res2(x)
+        x = self.relu(x)
+
         x = self.res3(x)
-        x = self.dropout(x)
-        x = self.pool4(x)
+        x = self.relu(x)
+
+        x = self.res4(x)
+        x = self.relu(x)
+
+        x = self.dropout2d(x)
+        x = self.pool5(x)
         x = self.flatten(x)
-        x = self.fc5(x)
+
+        x = self.fc6(x)
 
         return x
 
