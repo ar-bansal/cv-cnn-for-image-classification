@@ -154,6 +154,44 @@ class ResNetDropoutV3(ResNetDropoutV1):
         return x
 
 
+class ResNetDropoutV4(ResNetStyleV1):
+    """
+    Use 2-D dropout in all skip-connected blocks. The dropout is placed
+    after the conv2d layer in the residual branch. 
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.res2 = SkipConnection(
+            nn.Sequential(
+                ConvBlock(32, 32, kernel_size=3, stride=1, padding=1), 
+                nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1), 
+                nn.Dropout2d(0.1), 
+            )
+        )
+        # Output shape = (B, 32, 32, 32)
+
+        self.res3 = SkipConnection(
+            nn.Sequential(
+                ConvBlock(32, 64, kernel_size=3, stride=2, padding=1), 
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1), 
+                nn.Dropout2d(0.1), 
+            ), 
+            downsample=nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
+        )
+        # Output shape = (B, 64, 16, 16)
+
+        self.res4 = SkipConnection(
+            nn.Sequential(
+                ConvBlock(64, 128, kernel_size=3, stride=2, padding=1), 
+                nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1), 
+                nn.Dropout2d(0.1), 
+            ), 
+            downsample=nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1)
+        )
+        # Output shape = (B, 128, 8, 8)
+
+
 class ResNetWDecayV1(ResNetStyleV1):
     def __init__(self):
         super(ResNetWDecayV1, self).__init__()
