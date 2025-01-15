@@ -81,8 +81,8 @@ def get_metrics(predictions, targets, class_labels=None):
     }
 
 
-@log_pytorch(logging_kwargs={"log_every_n_epoch": 1})
-def train_and_evaluate(model, n_epochs, train_loader, val_loader, test_loader, class_labels, experiment_name):
+@log_pytorch(save_graph=True)
+def train_and_evaluate(model, n_epochs, train_loader, val_loader, test_loader, class_labels, experiment_name, input_shape):
     model = train(model, train_loader, val_loader, n_epochs)
 
     preds, targets = evaluate(model, test_loader)

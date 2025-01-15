@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
-from ml.models import ResNetWDecayV1
+from ml.models import ResNetDropoutV1
 from ml.pipelines import train_and_evaluate
 
 
@@ -17,7 +17,7 @@ def main():
         raise requests.exceptions.ConnectionError("Unable to reach MLOps.")
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
-    MODEL = ResNetWDecayV1()
+    MODEL = ResNetDropoutV1()
     BATCH_SIZE = 8
     RANDOM_STATE = 0
     NUM_EPOCHS = 1
@@ -86,7 +86,8 @@ def main():
         val_loader, 
         test_loader, 
         class_labels, 
-        experiment_name="inception-style-cnn"
+        experiment_name="inception-style-cnn", 
+        input_shape=(BATCH_SIZE, 3, 32, 32)
     )
 
 
