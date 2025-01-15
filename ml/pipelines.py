@@ -97,6 +97,7 @@ def run_pipeline(model, batch_size, num_epochs, num_workers, val_size, experimen
     DATA_DIR = os.path.join(os.getcwd(), "data")
     TRAIN_DATA_DIR = os.path.join(DATA_DIR, "train")
     TEST_DATA_DIR = os.path.join(DATA_DIR, "test")
+    INPUT_SHAPE = (batch_size, 3, 32, 32)
 
     tracking_server_uri = get_tracking_uri()
     mlflow.set_tracking_uri(tracking_server_uri)
@@ -159,5 +160,6 @@ def run_pipeline(model, batch_size, num_epochs, num_workers, val_size, experimen
         val_loader, 
         test_loader, 
         class_labels, 
-        experiment_name=experiment_name
+        experiment_name=experiment_name, 
+        input_shape=INPUT_SHAPE
     )
