@@ -22,6 +22,21 @@ class ConvBlock(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.act(x)
+        
+        return x
+    
+
+class ConvBlockBN(ConvBlock):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+        super().__init__(in_channels, out_channels, kernel_size, stride, padding)
+
+        self.bn = nn.BatchNorm2d(out_channels)
+    
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.act(x)
+
         return x
     
 
