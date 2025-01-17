@@ -9,7 +9,9 @@ from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
 from pytorch_lightning import Trainer
-from mlops.ml_logging import get_tracking_uri, log_pytorch
+from mlops.ml_logging import get_tracking_uri
+from mlops.ml_logging.loggers import PyTorchLogger
+
 
 
 __all__ = ["run_pipeline"]
@@ -81,7 +83,7 @@ def get_metrics(predictions, targets, class_labels=None):
     }
 
 
-@log_pytorch(save_graph=True)
+@PyTorchLogger(save_graph=True).log
 def train_and_evaluate(model, n_epochs, train_loader, val_loader, test_loader, class_labels, experiment_name, input_shape):
     model = train(model, train_loader, val_loader, n_epochs)
 
