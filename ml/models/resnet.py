@@ -339,7 +339,7 @@ class ResNetV2_BNV1(ResNetV2):
 
         self.res3 = SkipConnection(
             nn.Sequential(
-                nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1), 
+                nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1), 
                 nn.BatchNorm2d(32), 
                 nn.ReLU(), 
                 nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1), 
@@ -374,6 +374,31 @@ class ResNetV2_BNV1(ResNetV2):
         # Output shape = (B, 64)
 
         self.fc6 = nn.Linear(64, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        print(x.shape)
+
+        x = self.res2(x)
+        x = self.relu(x)
+        print(x.shape)
+
+        x = self.res3(x)
+        x = self.relu(x)
+        print(x.shape)
+
+        x = self.res4(x)
+        x = self.relu(x)
+        print(x.shape)
+
+        x = self.pool5(x)
+        x = self.flatten(x)
+        print(x.shape)
+
+        x = self.fc6(x)
+        print(x.shape)
+
+        return x  
 
     
 
