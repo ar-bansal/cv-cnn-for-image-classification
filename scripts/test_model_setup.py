@@ -10,12 +10,12 @@ from ml.pipelines import train_and_evaluate
 
 
 def main():
-    # MLFLOW_TRACKING_URI = "http://localhost:5001/"
-    # try:
-    #     requests.get(MLFLOW_TRACKING_URI)
-    # except:
-    #     raise requests.exceptions.ConnectionError("Unable to reach MLOps.")
-    # mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    MLFLOW_TRACKING_URI = "http://localhost:5001/"
+    try:
+        requests.get(MLFLOW_TRACKING_URI)
+    except:
+        raise requests.exceptions.ConnectionError("Unable to reach MLOps.")
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
     MODEL = ResNetV2_BNV1()
     BATCH_SIZE = 8
