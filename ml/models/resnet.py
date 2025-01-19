@@ -413,7 +413,7 @@ class ResNetV3(Model):
 
         self.res5 = SkipConnection(
             nn.Sequential(
-                ConvBlock(16, 32, kernel_size=3, stride=2, padding=1), 
+                ConvBlock(32, 32, kernel_size=3, stride=1, padding=1), 
                 nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
             )
         )
@@ -430,7 +430,7 @@ class ResNetV3(Model):
 
         self.res7 = SkipConnection(
             nn.Sequential(
-                ConvBlock(32, 64, kernel_size=3, stride=2, padding=1), 
+                ConvBlock(64, 64, kernel_size=3, stride=1, padding=1), 
                 nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
             ), 
         )
