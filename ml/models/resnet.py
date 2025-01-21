@@ -382,7 +382,7 @@ class ResNetV3(Model):
 
         self.relu = nn.ReLU()
         # Input shape = (B, 3, 32, 32)
-        self.conv1 = ConvBlock(3, 16, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
         #  Output shape = (B, 16, 32, 32)
 
         self.res2 = SkipConnection(
@@ -447,6 +447,7 @@ class ResNetV3(Model):
 
     def forward(self, x):
         x = self.conv1(x)
+        x = self.relu(x)
 
         x = self.res2(x)
         x = self.relu(x)
@@ -475,6 +476,106 @@ class ResNetV3(Model):
 
     def configure_optimizers(self):
         return optim.SGD(self.parameters(), lr=1e-3)
+    
+
+class ResNetV3_BNV1(ResNetV3):
+    def __init__(self):
+        super().__init__()
+
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1), 
+            nn.BatchNorm2d(16), 
+        )
+        #  Output shape = (B, 16, 32, 32)
+
+        self.res2 = SkipConnection(
+            nn.Sequential(
+                nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(16), 
+                nn.ReLU(), 
+                nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(16),
+            )
+        )
+        # Output shape = (B, 16, 32, 32)
+
+        self.res3 = SkipConnection(
+            nn.Sequential(
+                nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(16), 
+                nn.ReLU(), 
+                nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(16), 
+            )
+        )
+        # Output shape = (B, 16, 32, 32)
+
+
+        self.res4 = SkipConnection(
+            nn.Sequential(
+                nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1), 
+                nn.BatchNorm2d(32), 
+                nn.ReLU(), 
+                nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(32), 
+            ), 
+            downsample=nn.Sequential(
+                nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1), 
+                nn.BatchNorm2d(32), 
+            )
+        )
+        # Output shape = (B, 32, 16, 16)
+
+        self.res5 = SkipConnection(
+            nn.Sequential(
+                nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(32), 
+                nn.ReLU(),
+                nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(32), 
+            )
+        )
+        # Output shape = (B, 32, 16, 16)
+
+        self.res6 = SkipConnection(
+            nn.Sequential(
+                nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1), 
+                nn.BatchNorm2d(64), 
+                nn.ReLU(), 
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(64), 
+            ), 
+            downsample=nn.Sequential(
+                nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1), 
+                nn.BatchNorm2d(64)
+            )
+        )
+        # Output shape = (B, 64, 8, 8)
+
+        self.res7 = SkipConnection(
+            nn.Sequential(
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(64), 
+                nn.ReLU(), 
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1), 
+                nn.BatchNorm2d(64), 
+            ), 
+        )
+        # Output shape = (B, 64, 8, 8)
+
+
+class ResNetV3_WInit(ResNetV3):
+    def __init__(self):
+        super().__init__()
+
+    def _initialize_weights(self):
+        def init_weights(m):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+
+        self.apply(init_weights)
 
 
 class ResNetWDecayV1(ResNetStyleV1):
