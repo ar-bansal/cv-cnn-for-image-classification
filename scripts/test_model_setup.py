@@ -4,7 +4,7 @@ import time
 from mlops.server.operations import Server
 from ml.models import ResNetV3_WInit
 from ml.pipelines import run_pipeline
-from ml.datamodules import CIFAR10DataModule
+from ml.datamodules import CIFAR10TestingModule
 
 
 def main():
@@ -24,16 +24,10 @@ def main():
 
     
     MODEL = ResNetV3_WInit()
-    VAL_SIZE = 0.05
-    BATCH_SIZE = 256
     NUM_EPOCHS = 2
     EXPERIMENT_NAME = "resnet-style-cnn"
     
-    DATAMODULE = CIFAR10DataModule(
-        val_size=VAL_SIZE, 
-        batch_size=BATCH_SIZE, 
-        transform=None
-    )
+    DATAMODULE = CIFAR10TestingModule()
 
     run_pipeline(
         model=MODEL, 
