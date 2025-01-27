@@ -578,6 +578,62 @@ class ResNetV3_WInit(ResNetV3):
         self.apply(init_weights)
 
 
+class ResNetV3_Dropout(ResNetV3_BNV1):
+    def __init__(self):
+        super().__init__()
+
+        self.dropout = nn.Dropout(0.5)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.relu(x)
+
+        x = self.res2(x)
+        x = self.relu(x)
+
+        x = self.res3(x)
+        x = self.relu(x)
+
+        x = self.res4(x)
+        x = self.relu(x)
+
+        x = self.res5(x)
+        x = self.relu(x)
+
+        x = self.res6(x)
+        x = self.relu(x)
+
+        x = self.res7(x)
+        x = self.relu(x)
+
+        x = self.pool8(x)
+        x = self.flatten(x)
+        x = self.dropout(x)
+
+        x = self.fc9(x)
+
+        return x    
+
+
+class ResNetV3_full(ResNetV3_Dropout):
+    def __init__(self):
+        super().__init__()
+
+    def configure_optimizers(self):
+        optimizer = optim.SGD(self.parameters(), lr=1e-3)
+
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.2)
+
+        return {
+            "optimizer": optimizer, 
+            "lr_scheduler": {
+                "scheduler": scheduler, 
+                "interval": "epoch", 
+                "frequency": 30
+            }
+        }
+
+
 class ResNetWDecayV1(ResNetStyleV1):
     def __init__(self):
         super(ResNetWDecayV1, self).__init__()
